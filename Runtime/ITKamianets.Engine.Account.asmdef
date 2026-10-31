@@ -1,0 +1,14 @@
+{
+  "name": "ITKamianets.Engine.Account",
+  "rootNamespace": "ITKamianets.Engine.Account",
+  "references": ["ITKamianets.Engine.Core"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

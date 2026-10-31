@@ -1,0 +1,13 @@
+{
+  "name": "com.itkamianets.3d-unity-account",
+  "version": "0.1.0",
+  "displayName": "Unity Account",
+  "description": "The player's account for Temnorid games, the same Firebase account Lords uses: sign in as a guest (anonymous) or with Google, over Firebase's REST API with no Firebase SDK. A guest can sign in with Google later and keeps the same uid.",
+  "unity": "6000.6",
+  "dependencies": {
+    "com.unity.modules.unitywebrequest": "1.0.0",
+    "com.unity.modules.jsonserialize": "1.0.0"
+  },
+  "keywords": ["account", "firebase", "auth", "google", "engine"],
+  "author": { "name": "IT Kamianets" }
+}
