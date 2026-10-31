@@ -85,6 +85,20 @@ namespace ITKamianets.Engine.Account.Tests
 		}
 
 		[Test]
+		public void The_google_client_is_read_from_the_downloaded_json_in_either_shape()
+		{
+			var config = new FirebaseConfig();
+			Assert.IsTrue(OauthFile.Apply("{\"installed\":{\"client_id\":\"id1\",\"client_secret\":\"s1\"}}", config));
+			Assert.AreEqual("id1", config.GoogleDesktopClientId);
+			Assert.AreEqual("s1", config.GoogleDesktopClientSecret);
+			Assert.IsTrue(OauthFile.Apply("{\"client_id\":\"id2\",\"client_secret\":\"s2\"}", config));
+			Assert.AreEqual("id2", config.GoogleDesktopClientId);
+			Assert.IsFalse(OauthFile.Apply("", config));
+			Assert.IsFalse(OauthFile.Apply("{\"installed\":{}}", config));
+			Assert.IsFalse(OauthFile.Apply("<html>", config));
+		}
+
+		[Test]
 		public void No_google_client_means_no_google_button()
 		{
 			var before = GameAccount.Config;

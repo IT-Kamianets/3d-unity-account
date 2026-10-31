@@ -15,12 +15,56 @@ namespace ITKamianets.Engine.Account
 		public string GoogleDesktopClientId = "";
 		public string GoogleDesktopClientSecret = "";
 
-		/// <summary>The project Lords uses, so a lord signs in to the same account in every game.</summary>
-		public static FirebaseConfig Temnorid => new FirebaseConfig
+		/// <summary>
+		/// The project Lords uses, so a lord signs in to the same account in every game. The Google Desktop client is read from
+		/// <c>Assets/Resources/account-oauth.json</c> (the JSON Google lets you download for the client); that file stays out of git, so
+		/// the secret is never published, and the builds made on this machine carry it. Without the file there is no Google button.
+		/// </summary>
+		public static FirebaseConfig Temnorid
 		{
-			ApiKey = "AIzaSyDwqmZvJj599VIRrgQ6CCXKHSmwzqEeG7o",
-			ProjectId = "temnorid-arena",
-		};
+			get
+			{
+				var config = new FirebaseConfig { ApiKey = "AIzaSyDwqmZvJj599VIRrgQ6CCXKHSmwzqEeG7o", ProjectId = "temnorid-arena" };
+				var file = Resources.Load<TextAsset>("account-oauth");
+				if (file != null) OauthFile.Apply(file.text, config);
+				return config;
+			}
+		}
+	}
+
+	/// <summary>The JSON Google gives for an OAuth client: <c>{"installed":{"client_id":...,"client_secret":...}}</c>, or the two fields on their own.</summary>
+	[Serializable]
+	public sealed class OauthFile
+	{
+		[Serializable]
+		public sealed class Client
+		{
+			public string client_id;
+			public string client_secret;
+		}
+
+		public Client installed;
+		public string client_id;
+		public string client_secret;
+
+		public static bool Apply(string json, FirebaseConfig config)
+		{
+			if (string.IsNullOrWhiteSpace(json)) return false;
+			try
+			{
+				var file = JsonUtility.FromJson<OauthFile>(json);
+				var id = file?.installed != null && !string.IsNullOrEmpty(file.installed.client_id) ? file.installed.client_id : file?.client_id;
+				var secret = file?.installed != null && !string.IsNullOrEmpty(file.installed.client_secret) ? file.installed.client_secret : file?.client_secret;
+				if (string.IsNullOrEmpty(id)) return false;
+				config.GoogleDesktopClientId = id;
+				config.GoogleDesktopClientSecret = secret ?? "";
+				return true;
+			}
+			catch (ArgumentException)
+			{
+				return false;
+			}
+		}
 	}
 
 	/// <summary>The parts of the Firebase and Google REST answers this package reads. Field names follow the services so <see cref="JsonUtility"/> fills them.</summary>
