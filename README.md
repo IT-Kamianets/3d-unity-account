@@ -14,11 +14,19 @@ The player's account for Temnorid games: the same Firebase account Lords uses, s
 
 `FirebaseConfig.Temnorid` holds the web configuration of the Lords project (`temnorid-arena`). It is public configuration, the same as on the Lords site; access is decided by the Firestore rules, not by the key.
 
+### Firestore
+
+`FirestoreClient.ForAccount()` reads and patches documents as the signed-in player, over REST: the project is `GameAccount.Config.ProjectId`, the ID token `GameAccount.GetIdTokenAsync()` (sent as a bearer token, never logged).
+
+- `GetAsync("users/{uid}/progress/lords")` gives a `FirestoreDocument` (its `UpdateTime`, its fields as plain Newtonsoft JSON).
+- `PatchAsync(path, data, fieldPaths, updateTime)` changes only the named top-level fields (`updateMask.fieldPaths`) of an **existing** document; with `updateTime` the write fails with `FirestoreStatus.Conflict` if the document has changed since it was read, and without it `currentDocument.exists=true` still stops the patch from creating the document.
+- `FirestoreRest` converts Firestore's typed values (`integerValue`, `doubleValue`, `mapValue`, `arrayValue`, `timestampValue`, ...) to and from `JToken`, and builds the addresses and bodies as pure functions.
+- Statuses are words (`Ok`, `NotFound`, `Conflict`, `Denied`, `Failed`); messages never contain the answer's text or the document address, which hold uids.
+
 ### Status
 
-v0.1: guest sign-in, Google sign-in on Windows (needs the Desktop OAuth client), restore, token refresh, sign out, delete account. 8 edit-mode tests (PKCE against the RFC 7636 example, request building, answer parsing) and an explicit live test that makes a throwaway guest in the real project, refreshes and restores it, and deletes it.
+v0.2: Firestore get and patch (4 more edit-mode tests, none reaches the network). v0.1: guest sign-in, Google sign-in on Windows (needs the Desktop OAuth client), restore, token refresh, sign out, delete account. 8 edit-mode tests (PKCE against the RFC 7636 example, request building, answer parsing) and an explicit live test that makes a throwaway guest in the real project, refreshes and restores it, and deletes it.
 
 ### Roadmap
 
 - Google sign-in on Android and iOS (native sign-in, then the same `signInWithIdp` call).
-- Firestore reads and writes with the ID token, for the link between Craft and Lords.
